@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <title>卡片配對遊戲</title>
+  <link rel="stylesheet" href="style.css" type="text/css">
+</head>
+
+<body>
+
+  <div class="menu">
+    <a href="index.html"><img src="images/選單1.jpg" alt="按鈕1"></a>
+    <a href="02-Game.html"><img src="images/選單2.jpg" alt="按鈕2"></a>
+    <a href="03-Test.html"><img src="images/選單3.jpg" alt="按鈕3"></a>
+    <a href="04-Game.html"><img src="images/選單4.jpg" alt="按鈕4"></a>
+    <a href="05-Else.html"><img src="images/選單5.jpg" alt="按鈕5"></a>
+  </div>
+
+  <div class="divider">
+    <img src="images/分隔線2.jpg" alt="分隔線">
+  </div>
+
+  <div class="title-section">
+    <img src="images/標題4.jpg" alt="標題4">
+  </div>
+
+  <div id="question"></div>
+  <div id="feedback"></div>
+  <input type="number" id="answer-input">
+  <button id="check-btn">檢查答案</button>
+  
+  <button id="next-btn" style="display:none;">下一題</button>
+  
+
+  <script>
+    let correctAnswer = 0;
+
+    function numberToImage(n) {
+      return `<img src="images/${n}.jpg" alt="${n}" class="number-img">`;
+    }
+
+    function symbolToImage(symbol) {
+      let filename = '';
+      if (symbol === '+') filename = 'plus';
+      else if (symbol === '-') filename = 'minus';
+      else if (symbol === '=') filename = 'equal';
+      return `<img src="images/${filename}.jpg" alt="${symbol}" class="number-img">`;
+    }
+
+    function getRandomQuestion() {
+      let a = Math.floor(Math.random() * 11);
+      let b = Math.floor(Math.random() * 11);
+      let operator = Math.random() < 0.5 ? '+' : '-';
+
+      if (operator === '-' && a < b) [a, b] = [b, a];
+
+      return { a, b, operator };
+    }
+
+    function renderQuestion(a, operator, b) {
+      correctAnswer = operator === '+' ? a + b : a - b;
+      const html = `
+        ${numberToImage(a)}
+        ${symbolToImage(operator)}
+        ${numberToImage(b)}
+        ${symbolToImage('=')}
+        <img src="images/question_mark.jpg" alt="?" class="number-img">
+      `;
+      document.getElementById("question").innerHTML = html;
+      document.getElementById("feedback").innerText = '';
+      document.getElementById("answer-input").value = '';
+      document.getElementById("next-btn").style.display = "none";
+      document.getElementById("check-btn").style.display = 'inline-block';
+    }
+
+    function generateNewQuestion() {
+      const { a, b, operator } = getRandomQuestion();
+      renderQuestion(a, operator, b);
+    }
+
+    document.getElementById("check-btn").addEventListener("click", function () {
+      const userAnswer = parseInt(document.getElementById("answer-input").value, 10);
+      const feedback = document.getElementById("feedback");
+      feedback.style.fontSize = "36px";
+      if (isNaN(userAnswer)) {
+        feedback.innerText = "請輸入答案！";
+        feedback.style.color = "orange";
+        return;
+      }
+
+      if (userAnswer === correctAnswer) {
+        feedback.innerText = "答對了！🎉 點選「下一題」";
+        feedback.style.color = "green";
+        document.getElementById("next-btn").style.display = "inline-block";
+        document.getElementById("check-btn").style.display = 'none';
+      } else {
+        feedback.innerText = `答錯了，正確答案是 ${correctAnswer}。`;
+        feedback.style.color = "red";
+      }
+    });
+
+    // 下一題按鈕事件
+    document.getElementById("next-btn").addEventListener("click", function () {
+      generateNewQuestion();
+    });
+
+    // 顯示第一題
+    generateNewQuestion();
+  </script>
+
+
+</body>
+
+</html>
